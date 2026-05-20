@@ -5,10 +5,10 @@ namespace Posternak\ComposerFile;
 use Posternak\JsonFile\JsonFile;
 
 class ComposerLockFile {
-    private JsonFile $jsonFileManager;
+    private JsonFile $jsonFile;
 
     public function __construct(string $composerLockPath) {
-        $this->jsonFileManager = JsonFile::getInstance($composerLockPath);
+        $this->jsonFile = JsonFile::getInstance($composerLockPath);
     }
 
     public function getInstalledPackageVersion(string $packageName): ?string {
@@ -18,8 +18,8 @@ class ComposerLockFile {
 
     public function getPackageInfo(string $packageName): ?array {
         $allPackages = array_merge(
-            $this->jsonFileManager->getValueByPath('packages'),
-            $this->jsonFileManager->getValueByPath('packages-dev') ?? []
+            $this->jsonFile->getValueByPath('packages'),
+            $this->jsonFile->getValueByPath('packages-dev') ?? []
         );
 
         foreach ($allPackages as $package) {
