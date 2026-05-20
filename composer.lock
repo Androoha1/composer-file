@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c17c7bc7f8e22d99aafe5a95c3996576",
+    "content-hash": "2730fc333dae899dfc9997af44db2066",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -777,7 +777,7 @@
         },
         {
             "name": "posternak/json-file",
-            "version": "dev-main",
+            "version": "v0.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Androoha1/json-file.git",
@@ -792,18 +792,13 @@
             "require-dev": {
                 "phpunit/phpunit": "^13.1"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
                     "Posternak\\JsonFile\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Tests\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -815,8 +810,8 @@
             ],
             "description": "A PHP utility library to ergonomically work with JSON files.",
             "support": {
-                "source": "https://github.com/Androoha1/json-file/tree/main",
-                "issues": "https://github.com/Androoha1/json-file/issues"
+                "issues": "https://github.com/Androoha1/json-file/issues",
+                "source": "https://github.com/Androoha1/json-file/tree/v0.1.0"
             },
             "time": "2026-05-20T13:01:15+00:00"
         },
@@ -4224,9 +4219,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "posternak/json-file": 20
-    },
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {},
