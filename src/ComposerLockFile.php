@@ -31,7 +31,7 @@ class ComposerLockFile {
         throw new RuntimeException("Package '$packageName' is not installed");
     }
 
-    /** @return list<array<array-key, mixed>> */
+    /** @return array<int, array<array-key, mixed>> */
     public function getInstalledPackages(): array {
         return array_merge(
             $this->packagesSectionValidated('packages'),
@@ -39,7 +39,7 @@ class ComposerLockFile {
         );
     }
 
-    /** @return list<array<array-key, mixed>> */
+    /** @return array<int, array<array-key, mixed>> */
     private function packagesSectionValidated(string $sectionName): array {
         if (!$this->jsonFile->has($sectionName)) {
             return [];
@@ -50,14 +50,15 @@ class ComposerLockFile {
             throw new RuntimeException("Expected '$sectionName' section in composer.lock to be a JSON array, got " . gettype($section));
         }
 
-        $packages = [];
-        foreach ($section as $package) {
+        foreach ($section as $index => $package) {
+            if (!is_int($index)) {
+                throw new RuntimeException("Expected '$sectionName' to be a JSON array (integer-indexed)");
+            }
             if (!is_array($package)) {
                 throw new RuntimeException("Each entry in '$sectionName' must be a JSON object");
             }
-            $packages[] = $package;
         }
 
-        return $packages;
+        return $section;
     }
 }
