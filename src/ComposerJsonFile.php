@@ -16,41 +16,39 @@ class ComposerJsonFile extends JsonFile {
         return null;
     }
 
-    public function setPackageVersionConstraint(string $packageName, string $versionConstraint): self {
+    public function setPackageVersionConstraint(string $packageName, string $versionConstraint): void {
         $section = match (true) {
-            $this->has("require.$packageName") => 'require',
-            $this->has(["require-dev.$packageName"]) => 'require-dev',
+            $this->has("require.$packageName")     => 'require',
+            $this->has("require-dev.$packageName") => 'require-dev',
             default => throw new RuntimeException("Package '$packageName' not found in 'require' or 'require-dev'"),
         };
 
         $this->set("$section.$packageName", $versionConstraint);
         $this->save();
-
-        return $this;
     }
 
-    public function addPackage(string $packageName, string $versionConstraint, bool $dev = false): self {
-        if ($this->has(['require', $packageName]) || $this->has(['require-dev', $packageName])) {
+    public function addPackage(string $packageName, string $versionConstraint, bool $dev = false): void {
+        if ($this->has("require.$packageName") || $this->has("require-dev.$packageName")) {
             throw new RuntimeException("Package '$packageName' is already listed; use setPackageVersionConstraint() to update its constraint");
         }
 
-        $this->set([$dev ? 'require-dev' : 'require', $packageName], $versionConstraint);
+        $section = $dev ? 'require-dev' : 'require';
+        $this->set("$section.$packageName", $versionConstraint);
         $this->save();
-
-        return $this;
     }
 
-    public function removePackage(string $packageName): self {
+    public function removePackage(string $packageName): void {
         $section = match (true) {
             $this->has("require.$packageName")     => 'require',
             $this->has("require-dev.$packageName") => 'require-dev',
-            default => '',
+            default => null,
         };
+        if ($section === null) {
+            return;
+        }
 
-        $this->remove([$section, $packageName]);
+        $this->remove("$section.$packageName");
         $this->save();
-
-        return $this;
     }
 
     /** @return array<array-key, string> */
