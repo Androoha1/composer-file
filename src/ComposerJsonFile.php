@@ -7,35 +7,35 @@ use RuntimeException;
 
 class ComposerJsonFile extends JsonFile {
     public function getPackageVersionConstraint(string $packageName): ?string {
-        $packages = array_merge(
-            $this->section('require'),
-            $this->section('require-dev')
-        );
-        $versionConstraint = $packages[$packageName] ?? null;
-
-        return is_string($versionConstraint) ? $versionConstraint : null;
+        foreach (['require', 'require-dev'] as $section) {
+            if ($this->has([$section, $packageName])) {
+                $constraint = $this->get([$section, $packageName]);
+                return is_string($constraint) ? $constraint : null;
+            }
+        }
+        return null;
     }
 
     public function setPackageVersionConstraint(string $packageName, string $versionConstraint): self {
         $section = match (true) {
-            isset($this->section('require')[$packageName])     => 'require',
-            isset($this->section('require-dev')[$packageName]) => 'require-dev',
+            $this->has(['require', $packageName])     => 'require',
+            $this->has(['require-dev', $packageName]) => 'require-dev',
             default => throw new RuntimeException("Package '$packageName' not found in 'require' or 'require-dev'"),
         };
 
-        $this->set("$section.$packageName", $versionConstraint);
+        $this->set([$section, $packageName], $versionConstraint);
         $this->save();
 
         return $this;
     }
 
     public function addPackage(string $packageName, string $versionConstraint, bool $dev = false): self {
-        if (isset($this->section('require')[$packageName]) || isset($this->section('require-dev')[$packageName])) {
+        if ($this->has(['require', $packageName]) || $this->has(['require-dev', $packageName])) {
             throw new RuntimeException("Package '$packageName' is already listed; use setPackageVersionConstraint() to update its constraint");
         }
 
         $section = $dev ? 'require-dev' : 'require';
-        $this->set("$section.$packageName", $versionConstraint);
+        $this->set([$section, $packageName], $versionConstraint);
         $this->save();
 
         return $this;
@@ -43,44 +43,33 @@ class ComposerJsonFile extends JsonFile {
 
     public function removePackage(string $packageName): self {
         $section = match (true) {
-            isset($this->section('require')[$packageName])     => 'require',
-            isset($this->section('require-dev')[$packageName]) => 'require-dev',
+            $this->has(['require', $packageName])     => 'require',
+            $this->has(['require-dev', $packageName]) => 'require-dev',
             default => null,
         };
         if ($section === null) {
             return $this;
         }
 
-        $this->remove("$section.$packageName");
+        $this->remove([$section, $packageName]);
         $this->save();
 
         return $this;
     }
 
-    /** @return array<string, string> */
+    /** @return array<array-key, string> */
     public function getRequire(): array {
-        return $this->stringSection('require');
+        return $this->packageMap('require');
     }
 
-    /** @return array<string, string> */
+    /** @return array<array-key, string> */
     public function getRequireDev(): array {
-        return $this->stringSection('require-dev');
+        return $this->packageMap('require-dev');
     }
 
-    /** @return array<string, string> */
-    private function stringSection(string $name): array {
-        $result = [];
-        foreach ($this->section($name) as $package => $constraint) {
-            if (is_string($package) && is_string($constraint)) {
-                $result[$package] = $constraint;
-            }
-        }
-        return $result;
-    }
-
-    /** @return array<array-key, mixed> */
-    private function section(string $path): array {
-        $value = $this->has($path) ? $this->get($path) : [];
-        return is_array($value) ? $value : [];
+    /** @return array<array-key, string> */
+    private function packageMap(string $section): array {
+        $value = $this->has($section) ? $this->get($section) : [];
+        return is_array($value) ? array_filter($value, 'is_string') : [];
     }
 }
