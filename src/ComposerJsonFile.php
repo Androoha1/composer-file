@@ -6,14 +6,17 @@ use Posternak\JsonFile\JsonFile;
 use RuntimeException;
 
 class ComposerJsonFile extends JsonFile {
-    public function getPackageVersionConstraint(string $packageName): ?string {
+    public function getPackageVersionConstraint(string $packageName): string {
         foreach (['require', 'require-dev'] as $section) {
             if ($this->has("$section.$packageName")) {
                 $constraint = $this->get("$section.$packageName");
-                return is_string($constraint) ? $constraint : null;
+                if (!is_string($constraint)) {
+                    throw new RuntimeException("Constraint for '$packageName' in '$section' is not a string");
+                }
+                return $constraint;
             }
         }
-        return null;
+        throw new RuntimeException("Package '$packageName' not found in 'require' or 'require-dev'");
     }
 
     public function setPackageVersionConstraint(string $packageName, string $versionConstraint): void {

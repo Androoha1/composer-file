@@ -42,7 +42,7 @@ $file = new ComposerJsonFile('/path/to/composer.json');
 // Read a constraint from either `require` or `require-dev`
 $file->getPackageVersionConstraint('laravel/framework');   // "^v12.8.1"
 $file->getPackageVersionConstraint('phpunit/phpunit');     // "^12.1.2"
-$file->getPackageVersionConstraint('vendor/missing');      // null
+$file->getPackageVersionConstraint('vendor/missing');      // throws — guard with has() if unsure
 
 // Update an existing constraint in place — formatting and key order
 // of composer.json are preserved
@@ -63,11 +63,12 @@ $lock = new ComposerLockFile('/path/to/composer.lock');
 
 $lock->getInstalledPackageVersion('laravel/framework');   // "v12.8.1"
 $lock->getInstalledPackageVersion('phpunit/phpunit');     // "12.1.2"
-$lock->getInstalledPackageVersion('vendor/missing');      // null
+$lock->getInstalledPackageVersion('vendor/missing');      // throws — package not installed
 
 // Full lock entry (everything composer.lock records for the package)
 $lock->getPackageInfo('laravel/framework');
 // => ["name" => "laravel/framework", "version" => "v12.8.1", "type" => "library", ...]
+// Also throws if the package isn't installed.
 ```
 
 Both `packages` and `packages-dev` sections of the lock file are searched.

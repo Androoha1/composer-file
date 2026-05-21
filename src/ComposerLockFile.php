@@ -3,6 +3,7 @@
 namespace Posternak\ComposerFile;
 
 use Posternak\JsonFile\JsonFile;
+use RuntimeException;
 
 class ComposerLockFile {
     private JsonFile $jsonFile;
@@ -11,21 +12,23 @@ class ComposerLockFile {
         $this->jsonFile = new JsonFile($composerLockPath);
     }
 
-    public function getInstalledPackageVersion(string $packageName): ?string {
+    public function getInstalledPackageVersion(string $packageName): string {
         $version = $this->getPackageInfo($packageName)['version'] ?? null;
-
-        return is_string($version) ? $version : null;
+        if (!is_string($version)) {
+            throw new RuntimeException("Package '$packageName' has no string 'version' field in composer.lock");
+        }
+        return $version;
     }
 
-    /** @return array<array-key, mixed>|null */
-    public function getPackageInfo(string $packageName): ?array {
+    /** @return array<array-key, mixed> */
+    public function getPackageInfo(string $packageName): array {
         foreach ($this->getInstalledPackages() as $package) {
             if (($package['name'] ?? null) === $packageName) {
                 return $package;
             }
         }
 
-        return null;
+        throw new RuntimeException("Package '$packageName' is not installed");
     }
 
     /** @return list<array<array-key, mixed>> */

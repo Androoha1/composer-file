@@ -5,6 +5,7 @@ namespace Tests\Unit\ComposerLockFile;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Posternak\ComposerFile\ComposerLockFile;
+use RuntimeException;
 
 final class ComposerLockFileTest extends TestCase {
     private static string $composerLockFile = __DIR__ . '/Mocks/composer-lock-file.json';
@@ -22,9 +23,13 @@ final class ComposerLockFileTest extends TestCase {
     }
 
     #[Test]
-    public function returnsNullWhenPackageIsNotInstalled(): void {
+    public function throwsWhenAskingForVersionOfUninstalledPackage(): void {
         $lock = new ComposerLockFile(self::$composerLockFile);
-        $this->assertNull($lock->getInstalledPackageVersion('vendor/does-not-exist'));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("Package 'vendor/does-not-exist' is not installed");
+
+        $lock->getInstalledPackageVersion('vendor/does-not-exist');
     }
 
     #[Test]
@@ -37,9 +42,13 @@ final class ComposerLockFileTest extends TestCase {
     }
 
     #[Test]
-    public function getPackageInfoReturnsNullForUnknownPackage(): void {
+    public function throwsWhenAskingForInfoOfUninstalledPackage(): void {
         $lock = new ComposerLockFile(self::$composerLockFile);
-        $this->assertNull($lock->getPackageInfo('vendor/does-not-exist'));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("Package 'vendor/does-not-exist' is not installed");
+
+        $lock->getPackageInfo('vendor/does-not-exist');
     }
 
     #[Test]
