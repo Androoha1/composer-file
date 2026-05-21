@@ -19,13 +19,24 @@ class ComposerLockFile {
 
     /** @return array<array-key, mixed>|null */
     public function getPackageInfo(string $packageName): ?array {
-        foreach (array_merge($this->section('packages'), $this->section('packages-dev')) as $package) {
-            if (is_array($package) && ($package['name'] ?? null) === $packageName) {
+        foreach ($this->getInstalledPackages() as $package) {
+            if (($package['name'] ?? null) === $packageName) {
                 return $package;
             }
         }
 
         return null;
+    }
+
+    /** @return list<array<array-key, mixed>> */
+    public function getInstalledPackages(): array {
+        $result = [];
+        foreach (array_merge($this->section('packages'), $this->section('packages-dev')) as $package) {
+            if (is_array($package)) {
+                $result[] = $package;
+            }
+        }
+        return $result;
     }
 
     /** @return list<mixed> */

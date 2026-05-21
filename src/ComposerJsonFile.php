@@ -57,6 +57,27 @@ class ComposerJsonFile extends JsonFile {
         return $this;
     }
 
+    /** @return array<string, string> */
+    public function getRequire(): array {
+        return $this->stringSection('require');
+    }
+
+    /** @return array<string, string> */
+    public function getRequireDev(): array {
+        return $this->stringSection('require-dev');
+    }
+
+    /** @return array<string, string> */
+    private function stringSection(string $name): array {
+        $result = [];
+        foreach ($this->section($name) as $package => $constraint) {
+            if (is_string($package) && is_string($constraint)) {
+                $result[$package] = $constraint;
+            }
+        }
+        return $result;
+    }
+
     /** @return array<array-key, mixed> */
     private function section(string $path): array {
         $value = $this->has($path) ? $this->get($path) : [];

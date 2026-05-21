@@ -41,4 +41,15 @@ final class ComposerLockFileTest extends TestCase {
         $lock = new ComposerLockFile(self::$composerLockFile);
         $this->assertNull($lock->getPackageInfo('vendor/does-not-exist'));
     }
+
+    #[Test]
+    public function listsAllInstalledPackagesAcrossBothSections(): void {
+        $packages = (new ComposerLockFile(self::$composerLockFile))->getInstalledPackages();
+
+        $names = array_map(static fn (array $p): mixed => $p['name'] ?? null, $packages);
+        $this->assertSame(
+            ['laravel/framework', 'thecodingmachine/safe', 'phpunit/phpunit'],
+            $names,
+        );
+    }
 }
