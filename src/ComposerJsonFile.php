@@ -29,6 +29,34 @@ class ComposerJsonFile extends JsonFile {
         return $this;
     }
 
+    public function addPackage(string $packageName, string $versionConstraint, bool $dev = false): self {
+        if (isset($this->section('require')[$packageName]) || isset($this->section('require-dev')[$packageName])) {
+            throw new RuntimeException("Package '$packageName' is already listed; use setPackageVersionConstraint() to update its constraint");
+        }
+
+        $section = $dev ? 'require-dev' : 'require';
+        $this->set("$section.$packageName", $versionConstraint);
+        $this->save();
+
+        return $this;
+    }
+
+    public function removePackage(string $packageName): self {
+        $section = match (true) {
+            isset($this->section('require')[$packageName])     => 'require',
+            isset($this->section('require-dev')[$packageName]) => 'require-dev',
+            default => null,
+        };
+        if ($section === null) {
+            return $this;
+        }
+
+        $this->remove("$section.$packageName");
+        $this->save();
+
+        return $this;
+    }
+
     /** @return array<array-key, mixed> */
     private function section(string $path): array {
         $value = $this->has($path) ? $this->get($path) : [];
