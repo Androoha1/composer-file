@@ -33,18 +33,31 @@ class ComposerLockFile {
 
     /** @return list<array<array-key, mixed>> */
     public function getInstalledPackages(): array {
-        $result = [];
-        foreach (array_merge($this->section('packages'), $this->section('packages-dev')) as $package) {
-            if (is_array($package)) {
-                $result[] = $package;
-            }
-        }
-        return $result;
+        return array_merge(
+            $this->packagesSectionValidated('packages'),
+            $this->packagesSectionValidated('packages-dev'),
+        );
     }
 
-    /** @return list<mixed> */
-    private function section(string $name): array {
-        $value = $this->jsonFile->has($name) ? $this->jsonFile->get($name) : [];
-        return is_array($value) ? array_values($value) : [];
+    /** @return list<array<array-key, mixed>> */
+    private function packagesSectionValidated(string $sectionName): array {
+        if (!$this->jsonFile->has($sectionName)) {
+            return [];
+        }
+
+        $section = $this->jsonFile->get($sectionName);
+        if (!is_array($section)) {
+            throw new RuntimeException("Expected '$sectionName' section in composer.lock to be a JSON array, got " . gettype($section));
+        }
+
+        $packages = [];
+        foreach ($section as $package) {
+            if (!is_array($package)) {
+                throw new RuntimeException("Each entry in '$sectionName' must be a JSON object");
+            }
+            $packages[] = $package;
+        }
+
+        return $packages;
     }
 }
