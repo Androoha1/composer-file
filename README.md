@@ -1,5 +1,10 @@
 # composer-file
 
+[![CI](https://github.com/Androoha1/composer-file/actions/workflows/ci.yml/badge.svg)](https://github.com/Androoha1/composer-file/actions/workflows/ci.yml)
+[![Latest Version](https://img.shields.io/packagist/v/posternak/composer-file.svg)](https://packagist.org/packages/posternak/composer-file)
+[![PHP Version](https://img.shields.io/packagist/php-v/posternak/composer-file.svg)](https://packagist.org/packages/posternak/composer-file)
+[![License](https://img.shields.io/packagist/l/posternak/composer-file.svg)](LICENSE)
+
 The joyful way to programmatically read and edit `composer.json` and `composer.lock` in PHP — drop it into any script or automation.
 
 ## Requirements
