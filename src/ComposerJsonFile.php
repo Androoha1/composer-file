@@ -8,8 +8,8 @@ use RuntimeException;
 class ComposerJsonFile extends JsonFile {
     public function getPackageVersionConstraint(string $packageName): ?string {
         foreach (['require', 'require-dev'] as $section) {
-            if ($this->has([$section, $packageName])) {
-                $constraint = $this->get([$section, $packageName]);
+            if ($this->has("$section.$packageName")) {
+                $constraint = $this->get("$section.$packageName");
                 return is_string($constraint) ? $constraint : null;
             }
         }
@@ -18,12 +18,12 @@ class ComposerJsonFile extends JsonFile {
 
     public function setPackageVersionConstraint(string $packageName, string $versionConstraint): self {
         $section = match (true) {
-            $this->has(['require', $packageName])     => 'require',
-            $this->has(['require-dev', $packageName]) => 'require-dev',
+            $this->has("require.$packageName") => 'require',
+            $this->has(["require-dev.$packageName"]) => 'require-dev',
             default => throw new RuntimeException("Package '$packageName' not found in 'require' or 'require-dev'"),
         };
 
-        $this->set([$section, $packageName], $versionConstraint);
+        $this->set("$section.$packageName", $versionConstraint);
         $this->save();
 
         return $this;
@@ -34,8 +34,7 @@ class ComposerJsonFile extends JsonFile {
             throw new RuntimeException("Package '$packageName' is already listed; use setPackageVersionConstraint() to update its constraint");
         }
 
-        $section = $dev ? 'require-dev' : 'require';
-        $this->set([$section, $packageName], $versionConstraint);
+        $this->set([$dev ? 'require-dev' : 'require', $packageName], $versionConstraint);
         $this->save();
 
         return $this;
@@ -43,13 +42,10 @@ class ComposerJsonFile extends JsonFile {
 
     public function removePackage(string $packageName): self {
         $section = match (true) {
-            $this->has(['require', $packageName])     => 'require',
-            $this->has(['require-dev', $packageName]) => 'require-dev',
-            default => null,
+            $this->has("require.$packageName")     => 'require',
+            $this->has("require-dev.$packageName") => 'require-dev',
+            default => '',
         };
-        if ($section === null) {
-            return $this;
-        }
 
         $this->remove([$section, $packageName]);
         $this->save();
