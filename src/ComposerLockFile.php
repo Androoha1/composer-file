@@ -8,7 +8,7 @@ class ComposerLockFile {
     private JsonFile $jsonFile;
 
     public function __construct(string $composerLockPath) {
-        $this->jsonFile = JsonFile::getInstance($composerLockPath);
+        $this->jsonFile = new JsonFile($composerLockPath);
     }
 
     public function getInstalledPackageVersion(string $packageName): ?string {
@@ -18,8 +18,8 @@ class ComposerLockFile {
 
     public function getPackageInfo(string $packageName): ?array {
         $allPackages = array_merge(
-            $this->jsonFile->getValueByPath('packages'),
-            $this->jsonFile->getValueByPath('packages-dev') ?? []
+            $this->jsonFile->get('packages'),
+            $this->jsonFile->get('packages-dev'),
         );
 
         foreach ($allPackages as $package) {

@@ -13,8 +13,8 @@ class ComposerJsonFile extends JsonFile {
 
     public function getPackageVersionConstraint(string $packageName): ?string {
         $packages = array_merge(
-            $this->getValueByPath('require'),
-            $this->getValueByPath('require-dev')
+            $this->get('require'),
+            $this->get('require-dev'),
         );
 
         return $packages[$packageName] ?? null;
@@ -22,8 +22,8 @@ class ComposerJsonFile extends JsonFile {
 
     public function setPackageVersionConstraint(string $packageName, string $versionConstraint): self {
         $section = match (true) {
-            isset($this->getValueByPath('require')[$packageName])     => 'require',
-            isset($this->getValueByPath('require-dev')[$packageName]) => 'require-dev',
+            isset($this->get('require')[$packageName])     => 'require',
+            isset($this->get('require-dev')[$packageName]) => 'require-dev',
             default => throw new RuntimeException("Package '$packageName' not found in 'require' or 'require-dev'"),
         };
 
