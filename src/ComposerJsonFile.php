@@ -53,17 +53,36 @@ class ComposerJsonFile extends JsonFile {
 
     /** @return array<array-key, string> */
     public function getRequire(): array {
-        return $this->packageMap('require');
+        return $this->requirementsSectionValidated('require');
     }
 
     /** @return array<array-key, string> */
     public function getRequireDev(): array {
-        return $this->packageMap('require-dev');
+        return $this->requirementsSectionValidated('require-dev');
     }
 
-    /** @return array<array-key, string> */
-    private function packageMap(string $section): array {
-        $value = $this->has($section) ? $this->get($section) : [];
-        return is_array($value) ? array_filter($value, 'is_string') : [];
+    /**
+     * @return array<string, string>
+     */
+    private function requirementsSectionValidated(string $sectionName): array {
+        if (!$this->has($sectionName)) {
+            return [];
+        }
+
+        $section = $this->get($sectionName);
+        if (!is_array($section)) {
+            throw new RuntimeException("Expected '$sectionName' section in composer.json to be a JSON object, got " . gettype($section));
+        }
+
+        foreach ($section as $packageName => $constraint) {
+            if (!is_string($constraint)) {
+                throw new RuntimeException("Package constraint should be a string");
+            }
+            if (!is_string($packageName)) {
+                throw new RuntimeException("Package name should be a string");
+            }
+        }
+
+        return $section;
     }
 }
