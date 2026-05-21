@@ -4,7 +4,6 @@
     "type": "library",
     "require": {
         "php": "^8.2",
-        "composer/composer": "^2.9",
         "posternak/json-file": "^1.0.0"
     },
     "require-dev": {
