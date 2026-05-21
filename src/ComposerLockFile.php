@@ -34,9 +34,19 @@ class ComposerLockFile {
     /** @return array<int, array<array-key, mixed>> */
     public function getInstalledPackages(): array {
         return array_merge(
-            $this->packagesSectionValidated('packages'),
-            $this->packagesSectionValidated('packages-dev'),
+            $this->getInstalledRuntimePackages(),
+            $this->getInstalledDevPackages(),
         );
+    }
+
+    /** @return array<int, array<array-key, mixed>> */
+    public function getInstalledRuntimePackages(): array {
+        return $this->packagesSectionValidated('packages');
+    }
+
+    /** @return array<int, array<array-key, mixed>> */
+    public function getInstalledDevPackages(): array {
+        return $this->packagesSectionValidated('packages-dev');
     }
 
     /** @return array<int, array<array-key, mixed>> */

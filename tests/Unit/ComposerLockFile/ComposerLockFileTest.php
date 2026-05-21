@@ -61,4 +61,20 @@ final class ComposerLockFileTest extends TestCase {
             $names,
         );
     }
+
+    #[Test]
+    public function listsRuntimePackagesOnly(): void {
+        $packages = (new ComposerLockFile(self::$composerLockFile))->getInstalledRuntimePackages();
+
+        $names = array_map(static fn (array $p): mixed => $p['name'] ?? null, $packages);
+        $this->assertSame(['laravel/framework', 'thecodingmachine/safe'], $names);
+    }
+
+    #[Test]
+    public function listsDevPackagesOnly(): void {
+        $packages = (new ComposerLockFile(self::$composerLockFile))->getInstalledDevPackages();
+
+        $names = array_map(static fn (array $p): mixed => $p['name'] ?? null, $packages);
+        $this->assertSame(['phpunit/phpunit'], $names);
+    }
 }

@@ -74,6 +74,11 @@ $lock->getInstalledPackageVersion('vendor/missing');      // throws — package 
 $lock->getPackageInfo('laravel/framework');
 // => ["name" => "laravel/framework", "version" => "v12.8.1", "type" => "library", ...]
 // Also throws if the package isn't installed.
+
+// Iterate everything in the lock, or just runtime / dev
+$lock->getInstalledPackages();          // packages + packages-dev
+$lock->getInstalledRuntimePackages();   // packages only
+$lock->getInstalledDevPackages();       // packages-dev only
 ```
 
 Both `packages` and `packages-dev` sections of the lock file are searched.
