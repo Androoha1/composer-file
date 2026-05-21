@@ -2,6 +2,7 @@
     "name": "posternak/composer-file",
     "description": "The joyful way to programmatically read and edit composer.json and composer.lock in PHP — drop it into any script or automation.",
     "type": "library",
+    "keywords": ["composer", "composer-json", "composer-lock", "automation"],
     "require": {
         "php": "^8.2",
         "posternak/json-file": "^1.0.0"
