@@ -1,6 +1,6 @@
 {
     "name": "posternak/composer-file",
-    "description": "A thin ergonomic facade over Composer's SDK for everyday composer.json and composer.lock manipulation.",
+    "description": "The joyful way to programmatically read and edit composer.json and composer.lock in PHP — drop it into any script or automation.",
     "type": "library",
     "require": {
         "composer/composer": "^2.9",
